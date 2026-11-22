@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <script>
+/* Hand-off from dailynoodle.co.uk (22 Nov 2026): an old game link there forwards here as
+   /?go=reports/<game>.html#dnmove=<saves>. dn-track.js merges the saves on this page (which
+   writes none of its own) and reloads without the fragment; then this sends the player on. */
+(function(){try{if(location.hash.indexOf('#dnmove=')===0)return;var g=new URLSearchParams(location.search).get('go');
+if(g&&/^reports\/[a-z0-9-]+\.html$/.test(g))location.replace('/'+g+location.hash);}catch(e){}})();
+</script>
+<script>
 /* full-screen app only: hold the top and bottom insets and the screen height steady (dn-pin, 18 Oct 2026).
    On every page load Android briefly brings its bars back, which changed these and made the page jump.
    A value is taken up only once it has held for 0.7 s, and remembered per orientation for the next page. */
