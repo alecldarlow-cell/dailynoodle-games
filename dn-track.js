@@ -187,7 +187,14 @@
           localStorage.setItem('digi.aid.prev', JSON.stringify(prev.slice(-5)));
         }
       } catch (e) {}
-      importData(p.d, p.b);
+      // p.w === 1 (22 Nov 2026): the first hand-off from dailynoodle.co.uk for this browser. Anything here was
+      // started before the player's real progress arrived (a game writes a fresh save when it opens), so the
+      // saves that came across win outright; later hand-offs merge as usual.
+      // The first arrival is remembered here (dn.moved.in), so only it wins outright.
+      var first = false; try { first = p.w === 1 && localStorage.getItem('dn.moved.in') !== '1'; } catch (e) {}
+      if (first) { for (var wk in p.d) { if (wk !== 'digi.aid' && wk !== 'digi.aid.prev') { try { localStorage.setItem(wk, p.d[wk]); } catch (e) {} } } }
+      else importData(p.d, p.b);
+      try { if (p.w === 1) localStorage.setItem('dn.moved.in', '1'); } catch (e) {}
     }
     window.DN_MOVING = true;
     history.replaceState(null, '', location.pathname + location.search + ((p && typeof p.h === 'string') ? p.h : ''));
