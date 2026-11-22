@@ -3,6 +3,6 @@
   "private": true,
   "scripts": {
     "build": "node tools/build.js",
-    "test": "node tools/check.js"
+    "test": "node tools/check.js && node --test tools/tests/*.test.js"
   }
 }

@@ -26,6 +26,7 @@ jobs:
           node-version: '22'
       - run: node tools/build.js
       - run: node tools/check.js
+      - run: node --test tools/tests/*.test.js
       - name: Commit generated files
         run: |
           git config user.name "dailynoodle-bot"
