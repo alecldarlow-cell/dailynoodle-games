@@ -122,6 +122,16 @@
   }
   function isStreak(o){ return isObj(o) && 'last' in o && ('streak' in o || 'n' in o); }
   function finished(d){ return isObj(d) && d.state === 'done'; }
+  function betterLv(a, b){ var u = {}, j; for (j in a) u[j] = a[j]; for (j in b) if (!isObj(u[j]) || (+(b[j] && b[j].s) || 0) > (+u[j].s || 0)) u[j] = b[j]; return u; }
+  function restoreOver(hereRaw, oldRaw){
+    var here = parse(hereRaw), old = parse(oldRaw);
+    if (!isObj(here) || !isObj(old)) return oldRaw;
+    if (isObj(old.lv) && isObj(here.lv)) old.lv = betterLv(old.lv, here.lv);
+    if (isObj(old.big) && isObj(here.big) && isObj(old.big.lv) && isObj(here.big.lv)) { old.big.lv = betterLv(old.big.lv, here.big.lv); old.big.best = Math.max(+old.big.best || 0, +here.big.best || 0); }
+    if (Array.isArray(old.words) && Array.isArray(here.words)) { var seen = {}; old.words = old.words.concat(here.words).filter(function(w){ return seen[w] ? 0 : (seen[w] = 1); }); }
+    if ('best' in old || 'best' in here) old.best = Math.max(+old.best || 0, +here.best || 0);
+    return JSON.stringify(old);
+  }
 
   /* A player's own link from the board page (21 Oct 2026, dn-board.js
      moveLink) also carries b: {pid, leagues, cur}, the leaderboard id. This
@@ -192,7 +202,11 @@
       // saves that came across win outright; later hand-offs merge as usual.
       // The first arrival is remembered here (dn.moved.in), so only it wins outright.
       var first = false; try { first = p.w === 1 && localStorage.getItem('dn.moved.in') !== '1'; } catch (e) {}
-      if (first) { for (var wk in p.d) { if (wk !== 'digi.aid' && wk !== 'digi.aid.prev') { try { localStorage.setItem(wk, p.d[wk]); } catch (e) {} } } }
+      // p.w === 2 (22 Nov 2026): a restore (the old link with ?restore), carrying only that game's own saves.
+      // They win over what's here, except that levels cleared here keep their better stars (Yarn's lv,
+      // big.lv), found words are pooled and the higher best is kept, so play since the move isn't lost.
+      if (p.w === 2) { for (var rk in p.d) { if (rk !== 'digi.aid' && rk !== 'digi.aid.prev') { try { localStorage.setItem(rk, restoreOver(localStorage.getItem(rk), p.d[rk])); } catch (e) {} } } }
+      else if (first) { for (var wk in p.d) { if (wk !== 'digi.aid' && wk !== 'digi.aid.prev') { try { localStorage.setItem(wk, p.d[wk]); } catch (e) {} } } }
       else importData(p.d, p.b);
       try { if (p.w === 1) localStorage.setItem('dn.moved.in', '1'); } catch (e) {}
     }
