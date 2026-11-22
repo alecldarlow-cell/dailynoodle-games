@@ -6,5 +6,5 @@ for(const t of ["inject-tracker.js","og-tags.js","build-feed.js"]){const r=spawn
 fs.rmSync('_site',{recursive:true,force:true});fs.mkdirSync('_site');
 const KEEP=/^(index\.html|404\.html|front\.(css|js)|dn-[a-z]+\.js|feed\.json|manifest\.webmanifest)$/;
 for(const f of fs.readdirSync('.'))if(KEEP.test(f))fs.copyFileSync(f,path.join('_site',f));
-for(const d of ['reports','icons','assets'])fs.cpSync(d,path.join('_site',d),{recursive:true});
+for(const d of ['reports','icons','assets','engines'])fs.cpSync(d,path.join('_site',d),{recursive:true});
 console.log('Built _site');
